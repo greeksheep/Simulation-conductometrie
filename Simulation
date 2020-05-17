@@ -1,0 +1,48 @@
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+import math
+
+def titrage(cAH, cB, vAH):
+    vEAU = input("quel volume en ml?")
+    LA = 35
+    LNa = 5
+    LB = 20
+    Lcl = 8
+    vE = cAH * vAH / cB  # calcul du volume equivalent
+    v = [i * vE / 100 for i in range(int(20*vE))]
+    conduc = []
+    for x in v:
+        if x <= vE:
+            conduc.append(LA * (cAH*vAH-cB*x) / (x+vEAU) + Lcl * cAH*vAH / (x+vEAU) + LNa * cB * x / (x + vEAU))
+        else:
+            conduc.append(LB * cB * (x - vE) / (x + vEAU) + Lcl * cAH * vAH / (x + vEAU) + LNa * cB * x / (x + vEAU))
+
+    ph = []
+    for x in v:
+        if x < vE:
+            ph.append(-math.log((cAH*vAH-cB*x) / (x + vEAU)))
+        else:
+                if x == 10:
+                    ph.append(7)
+                else:
+                    ph.append(14 + math.log((cB * (x - vE ) / (x + vEAU))))
+    fig2 = plt.figure(constrained_layout=True)
+    spec2 = gridspec.GridSpec(ncols=2, nrows=1, figure=fig2)
+    f2_ax1 = fig2.add_subplot(spec2[0, 0])
+    f2_ax2 = fig2.add_subplot(spec2[0, 1])
+    plt.subplot(2, 1, 1)
+    plt.title("Titrage")
+    plt.plot(v, ph, 'b-', lw=1, label='ph')
+    plt.xlabel('V (mL)')
+    plt.ylabel('pH')
+    plt.grid(True)
+    plt.legend()
+    plt.subplot(2, 1, 2)
+    plt.plot(v, conduc, 'r-', lw=1, label='conductivite')
+    plt.xlabel('V (mL)')
+    plt.ylabel('conductivite (S.cm-1)')
+    plt.grid(True)
+    plt.legend()
+
+titrage(0.1, 0.1, 10) # (concentration acide, concentration base, volume acide)
+plt.show()
